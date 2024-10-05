@@ -1,7 +1,9 @@
 package guru.springframework.reactivemongo.bootstrap;
 
 import guru.springframework.reactivemongo.domain.Beer;
+import guru.springframework.reactivemongo.domain.Customer;
 import guru.springframework.reactivemongo.repositories.BeerRepository;
+import guru.springframework.reactivemongo.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 public class BootstrapData implements CommandLineRunner {
 
     private final BeerRepository beerRepository;
+    private final CustomerRepository customerRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -25,6 +28,10 @@ public class BootstrapData implements CommandLineRunner {
                     loadBeerData();
                 })
                         .subscribe();
+
+        customerRepository.deleteAll()
+                .doOnSuccess(s -> loadCustomerData())
+                .subscribe();
     }
 
     private void loadBeerData() {
@@ -64,6 +71,28 @@ public class BootstrapData implements CommandLineRunner {
                 beerRepository.save(beer1).subscribe();
                 beerRepository.save(beer2).subscribe();
                 beerRepository.save(beer3).subscribe();
+            }
+        });
+    }
+
+    private void loadCustomerData() {
+        customerRepository.count().subscribe(count -> {
+            if (count == 0) {
+                Customer customer1 = Customer.builder()
+                        .customerName("John")
+                        .build();
+
+                Customer customer2 = Customer.builder()
+                        .customerName("Mark")
+                        .build();
+
+                Customer customer3 = Customer.builder()
+                        .customerName("Anna")
+                        .build();
+
+                customerRepository.save(customer1).subscribe();
+                customerRepository.save(customer2).subscribe();
+                customerRepository.save(customer3).subscribe();
             }
         });
     }
