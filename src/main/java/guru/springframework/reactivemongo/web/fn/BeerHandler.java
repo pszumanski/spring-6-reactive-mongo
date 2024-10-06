@@ -43,7 +43,6 @@ public class BeerHandler {
 
     public Mono<ServerResponse> patchBeerById(ServerRequest request){
         return request.bodyToMono(BeerDTO.class)
-                .doOnNext(this::validate)
                 .flatMap(beerDTO -> beerService
                         .patchBeer(request.pathVariable("beerId"),beerDTO))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
